@@ -53,9 +53,12 @@ export default function Dashboard() {
               <div className="p-4">
                 <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-1">{item.name}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{item.description}</p>
-                <button className="w-full py-2 text-sm rounded-lg bg-indigo-900 text-white hover:bg-indigo-800 transition-colors cursor-pointer">
+                <a
+                  href={`/dashboard/emprunt/${item.id}`}
+                  className="block w-full text-center py-2 text-sm rounded-lg bg-indigo-900 text-white hover:bg-indigo-800 transition-colors cursor-pointer"
+                >
                   Emprunter
-                </button>
+                </a>
               </div>
             </div>
           ))}

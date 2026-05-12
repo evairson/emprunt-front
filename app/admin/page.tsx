@@ -2,32 +2,20 @@
 import { useEffect, useState } from 'react';
 import { API_URL } from '@/lib/constants';
 import type { User } from '@/types/user';
+import type { Emprunt } from '@/types/emprunt';
 import Button from '@/components/button';
-
-interface EmpruntRequest {
-  id: string;
-  userName: string;
-  materialName: string;
-  requestedAt: string;
-  status: 'EN_ATTENTE' | 'ACCEPTE' | 'REFUSE';
-}
-
-const MOCK_REQUESTS: EmpruntRequest[] = [
-  { id: '1', userName: 'Alice Martin', materialName: 'Tente 4 places', requestedAt: '2026-05-10', status: 'EN_ATTENTE' },
-  { id: '2', userName: 'Bob Dupont', materialName: 'Kayak', requestedAt: '2026-05-09', status: 'ACCEPTE' },
-  { id: '3', userName: 'Chloé Bernard', materialName: 'Ballon de foot', requestedAt: '2026-05-08', status: 'REFUSE' },
-];
-
-const STATUS_STYLE: Record<EmpruntRequest['status'], string> = {
-  EN_ATTENTE: 'bg-yellow-100 text-yellow-700',
-  ACCEPTE: 'bg-green-100 text-green-700',
-  REFUSE: 'bg-red-100 text-red-600',
-};
 
 export default function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [promoting, setPromoting] = useState(false);
+  const [emprunts, setEmprunts] = useState<Emprunt[]>([]);
+  const [processingId, setProcessingId] = useState<string | null>(null);
+
+  const loadEmprunts = () =>
+    fetch(`${API_URL}/emprunt`, { credentials: 'include' })
+      .then((res) => res.json() as Promise<Emprunt[]>)
+      .then(setEmprunts);
 
   useEffect(() => {
     fetch(`${API_URL}/auth/me`, { credentials: 'include' })
@@ -36,10 +24,30 @@ export default function AdminPage() {
         return res.json() as Promise<User>;
       })
       .then((data) => {
-        if (data) setUser(data);
+        if (data) {
+          setUser(data);
+          if (data.role === 'ADMIN') return loadEmprunts();
+        }
       })
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  const handleDecision = async (id: string, action: 'approve' | 'reject') => {
+    setProcessingId(id);
+    try {
+      const res = await fetch(`${API_URL}/emprunt/${id}/${action}`, {
+        method: 'PATCH',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error();
+      await loadEmprunts();
+    } catch {
+      // ignore
+    } finally {
+      setProcessingId(null);
+    }
+  };
 
   const handleMakeAdmin = async () => {
     if (!user) return;
@@ -75,6 +83,8 @@ export default function AdminPage() {
     );
   }
 
+  const pending = emprunts.filter((e) => e.status === 'PENDING');
+
   return (
     <>
       <header className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800">
@@ -87,31 +97,63 @@ export default function AdminPage() {
 
       <main className="p-8 flex flex-col gap-10 max-w-4xl mx-auto w-full">
         <section>
-          <h2 className="text-lg font-semibold mb-4">Demandes d&apos;emprunt</h2>
-          <table className="w-full border-collapse text-sm">
-            <thead>
-              <tr className="bg-gray-100 dark:bg-gray-800 text-left">
-                <th className="p-3 border border-gray-200 dark:border-gray-700">Cotisant</th>
-                <th className="p-3 border border-gray-200 dark:border-gray-700">Matériel</th>
-                <th className="p-3 border border-gray-200 dark:border-gray-700">Date</th>
-                <th className="p-3 border border-gray-200 dark:border-gray-700">Statut</th>
-              </tr>
-            </thead>
-            <tbody>
-              {MOCK_REQUESTS.map((req) => (
-                <tr key={req.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
-                  <td className="p-3 border border-gray-200 dark:border-gray-700">{req.userName}</td>
-                  <td className="p-3 border border-gray-200 dark:border-gray-700">{req.materialName}</td>
-                  <td className="p-3 border border-gray-200 dark:border-gray-700">{req.requestedAt}</td>
-                  <td className="p-3 border border-gray-200 dark:border-gray-700">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLE[req.status]}`}>
-                      {req.status.replace('_', ' ')}
-                    </span>
-                  </td>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Demandes d&apos;emprunt en attente</h2>
+            <a href="/admin/emprunts" className="text-sm text-indigo-600 hover:underline">
+              Voir l&apos;historique
+            </a>
+          </div>
+          {pending.length === 0 ? (
+            <p className="text-gray-500 dark:text-gray-400">Aucune demande en attente.</p>
+          ) : (
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr className="bg-gray-100 dark:bg-gray-800 text-left">
+                  <th className="p-3 border border-gray-200 dark:border-gray-700">Cotisant</th>
+                  <th className="p-3 border border-gray-200 dark:border-gray-700">Matériel</th>
+                  <th className="p-3 border border-gray-200 dark:border-gray-700">Demandé le</th>
+                  <th className="p-3 border border-gray-200 dark:border-gray-700">Période</th>
+                  <th className="p-3 border border-gray-200 dark:border-gray-700">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {pending.map((e) => (
+                  <tr key={e.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
+                    <td className="p-3 border border-gray-200 dark:border-gray-700">
+                      {e.user?.name ?? e.userId}
+                    </td>
+                    <td className="p-3 border border-gray-200 dark:border-gray-700">
+                      {e.material?.name ?? e.materialId}
+                    </td>
+                    <td className="p-3 border border-gray-200 dark:border-gray-700">
+                      {new Date(e.createdAt).toLocaleDateString('fr-FR')}
+                    </td>
+                    <td className="p-3 border border-gray-200 dark:border-gray-700">
+                      {new Date(e.startDate).toLocaleDateString('fr-FR')} → {new Date(e.endDate).toLocaleDateString('fr-FR')}
+                    </td>
+                    <td className="p-3 border border-gray-200 dark:border-gray-700">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleDecision(e.id, 'approve')}
+                          disabled={processingId === e.id}
+                          className="px-3 py-1 text-xs rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                        >
+                          Accepter
+                        </button>
+                        <button
+                          onClick={() => handleDecision(e.id, 'reject')}
+                          disabled={processingId === e.id}
+                          className="px-3 py-1 text-xs rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                        >
+                          Refuser
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </section>
 
         <section>
