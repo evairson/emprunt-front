@@ -35,8 +35,8 @@ export default function AdminPage() {
     return (
     <>
     <header className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800">
-        <a href="/dashboard" className="text-xl font-bold flex items-center gap-2">
-          ← Retour
+        <a href="/dashboard" className="text-xl font-bold">
+          Retour
         </a>
       </header>
       <main className="flex flex-1 flex-col items-center justify-center gap-4">
@@ -44,6 +44,10 @@ export default function AdminPage() {
         <Button onClick={handleMakeAdmin} disabled={promoting}>
           {promoting ? 'En cours...' : 'Devenir administrateur'}
         </Button>
+        <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+          Note : Ce bouton est uniquement pour pouvoir tester les fonctionnalités administrateur. <br />
+           En conditions normales, les rôles sont gérés par la base de données et ne peuvent pas être modifiés par les utilisateurs.
+        </p>
       </main>
       </>
     );
