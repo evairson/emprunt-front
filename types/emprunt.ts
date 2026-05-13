@@ -10,6 +10,7 @@ export interface Emprunt {
   startDate: string;
   endDate: string;
   status: EmpruntStatus;
+  returnedAt: string | null;
   createdAt: string;
   material?: Material;
   user?: User;

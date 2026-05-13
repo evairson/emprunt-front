@@ -11,6 +11,7 @@ export default function AdminPage() {
   const [promoting, setPromoting] = useState(false);
   const [emprunts, setEmprunts] = useState<Emprunt[]>([]);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [now] = useState(() => Date.now());
 
   const loadEmprunts = () =>
     fetch(`${API_URL}/emprunt`, { credentials: 'include' })
@@ -37,6 +38,22 @@ export default function AdminPage() {
     setProcessingId(id);
     try {
       const res = await fetch(`${API_URL}/emprunt/${id}/${action}`, {
+        method: 'PATCH',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error();
+      await loadEmprunts();
+    } catch {
+      // ignore
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleMarkReturned = async (id: string) => {
+    setProcessingId(id);
+    try {
+      const res = await fetch(`${API_URL}/emprunt/${id}/return`, {
         method: 'PATCH',
         credentials: 'include',
       });
@@ -84,6 +101,14 @@ export default function AdminPage() {
   }
 
   const pending = emprunts.filter((e) => e.status === 'PENDING');
+  const ongoing = emprunts
+    .filter(
+      (e) =>
+        e.status === 'APPROVED' &&
+        !e.returnedAt &&
+        new Date(e.startDate).getTime() <= now,
+    )
+    .sort((a, b) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime());
 
   return (
     <>
@@ -151,6 +176,66 @@ export default function AdminPage() {
                     </td>
                   </tr>
                 ))}
+              </tbody>
+            </table>
+          )}
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold mb-4">Locations en cours</h2>
+          {ongoing.length === 0 ? (
+            <p className="text-gray-500 dark:text-gray-400">Aucune location en cours.</p>
+          ) : (
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr className="bg-gray-100 dark:bg-gray-800 text-left">
+                  <th className="p-3 border border-gray-200 dark:border-gray-700">Cotisant</th>
+                  <th className="p-3 border border-gray-200 dark:border-gray-700">Matériel</th>
+                  <th className="p-3 border border-gray-200 dark:border-gray-700">Période</th>
+                  <th className="p-3 border border-gray-200 dark:border-gray-700">Retour prévu</th>
+                  <th className="p-3 border border-gray-200 dark:border-gray-700">Rendu ?</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ongoing.map((e) => {
+                  const overdue = new Date(e.endDate).getTime() < now;
+                  return (
+                    <tr
+                      key={e.id}
+                      className={overdue ? 'bg-red-50 dark:bg-red-950/30' : 'hover:bg-gray-50 dark:hover:bg-gray-900'}
+                    >
+                      <td className="p-3 border border-gray-200 dark:border-gray-700">
+                        {e.user?.name ?? e.userId}
+                      </td>
+                      <td className="p-3 border border-gray-200 dark:border-gray-700">
+                        {e.material?.name ?? e.materialId}
+                      </td>
+                      <td className="p-3 border border-gray-200 dark:border-gray-700">
+                        {new Date(e.startDate).toLocaleDateString('fr-FR')} → {new Date(e.endDate).toLocaleDateString('fr-FR')}
+                      </td>
+                      <td className="p-3 border border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center gap-2">
+                          {new Date(e.endDate).toLocaleDateString('fr-FR')}
+                          {overdue && (
+                            <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-red-200 text-red-800">
+                              En retard
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-3 border border-gray-200 dark:border-gray-700">
+                        <input
+                          type="checkbox"
+                          checked={false}
+                          onChange={() => handleMarkReturned(e.id)}
+                          disabled={processingId === e.id}
+                          className="w-4 h-4 cursor-pointer"
+                          title="Marquer comme rendu"
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}

@@ -196,6 +196,22 @@ export interface paths {
         patch: operations["EmpruntController_reject"];
         trace?: never;
     };
+    "/emprunt/{id}/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["EmpruntController_markReturned"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -419,6 +435,7 @@ export interface operations {
         requestBody: {
             content: {
                 "multipart/form-data": {
+                    /** Format: binary */
                     file?: string;
                 };
             };
@@ -507,6 +524,25 @@ export interface operations {
         };
     };
     EmpruntController_reject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EmpruntController_markReturned: {
         parameters: {
             query?: never;
             header?: never;
