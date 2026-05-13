@@ -61,7 +61,20 @@ export default function Dashboard() {
           <Image src="/logo.png" alt="BDS" width={48} height={48} className="h-12 w-auto" />
           <span className="text-xl font-bold hidden sm:inline">Emprunt de matériel</span>
         </a>
-        <a href="/admin" className="hover:underline font-medium">Panel Admin</a>
+        <div className="flex items-center gap-4">
+          {user?.role === 'ADMIN' && (
+            <a href="/admin" className="hover:underline font-medium">Panel Admin</a>
+          )}
+          <button
+            onClick={async () => {
+              await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+              window.location.href = '/';
+            }}
+            className="text-sm text-red-600 hover:underline cursor-pointer"
+          >
+            Déconnexion
+          </button>
+        </div>
       </header>
 
       <main className="p-8 flex flex-col gap-10">

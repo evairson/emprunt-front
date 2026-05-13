@@ -1,11 +1,25 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '@/services/api';
+import { API_URL } from '@/lib/constants';
 import Button from '@/components/button';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>(''); 
+  const [error, setError] = useState<string>('');
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_URL}/auth/me`, { credentials: 'include' })
+      .then((res) => {
+        if (res.ok) {
+          window.location.href = '/dashboard';
+          return;
+        }
+        setCheckingAuth(false);
+      })
+      .catch(() => setCheckingAuth(false));
+  }, []);
 
   const handleLogin = async () => {
     try {
@@ -26,6 +40,10 @@ export default function Home() {
       setIsLoading(false);
     }
   };
+
+  if (checkingAuth) {
+    return <div className="flex flex-1 items-center justify-center" />;
+  }
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
