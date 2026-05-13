@@ -164,6 +164,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/emprunt/blocked/{materialId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["EmpruntController_blockedDates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/emprunt/{id}/approve": {
         parameters: {
             query?: never;
@@ -492,6 +508,25 @@ export interface operations {
             query?: never;
             header?: never;
             path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EmpruntController_blockedDates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                materialId: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
