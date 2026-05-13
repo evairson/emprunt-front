@@ -57,10 +57,11 @@ export default function Dashboard() {
   return (
     <>
       <header className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800">
-        <h1 className="text-xl font-bold">BDS — Emprunt de matériel</h1>
-
+        <a href="/dashboard" className="flex items-center gap-3">
+          <Image src="/logo.png" alt="BDS" width={48} height={48} className="h-12 w-auto" />
+          <span className="text-xl font-bold hidden sm:inline">Emprunt de matériel</span>
+        </a>
         <a href="/admin" className="hover:underline font-medium">Panel Admin</a>
-
       </header>
 
       <main className="p-8 flex flex-col gap-10">
