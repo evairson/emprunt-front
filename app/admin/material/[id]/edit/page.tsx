@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
-import { API_URL } from '@/lib/constants';
+import { API_URL, photoSrc } from '@/lib/constants';
 import type { User } from '@/types/user';
 import type { Material } from '@/types/material';
 import Button from '@/components/button';
@@ -14,7 +15,8 @@ export default function EditMaterialPage() {
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [photoUrl, setPhotoUrl] = useState('');
+  const [currentPhoto, setCurrentPhoto] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -34,7 +36,7 @@ export default function EditMaterialPage() {
           .then((m) => {
             setName(m.name);
             setDescription(m.description);
-            setPhotoUrl(m.photoUrl ?? '');
+            setCurrentPhoto(m.photoUrl);
           });
       })
       .catch(() => setError('Impossible de charger le matériel'))
@@ -50,13 +52,21 @@ export default function EditMaterialPage() {
         method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          description,
-          photoUrl: photoUrl || undefined,
-        }),
+        body: JSON.stringify({ name, description }),
       });
       if (!res.ok) throw new Error('Échec de la modification');
+
+      if (photo) {
+        const form = new FormData();
+        form.append('file', photo);
+        const photoRes = await fetch(`${API_URL}/material/${id}/photo`, {
+          method: 'POST',
+          credentials: 'include',
+          body: form,
+        });
+        if (!photoRes.ok) throw new Error('Modifié mais échec de l\'upload de la photo');
+      }
+
       router.push('/admin/material');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue');
@@ -65,6 +75,8 @@ export default function EditMaterialPage() {
   };
 
   if (loading) return <p className="p-8">Chargement...</p>;
+
+  const previewSrc = photoSrc(currentPhoto);
 
   return (
     <>
@@ -93,13 +105,18 @@ export default function EditMaterialPage() {
             rows={3}
             className="border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-gray-900"
           />
-          <input
-            type="url"
-            placeholder="URL de la photo (optionnel)"
-            value={photoUrl}
-            onChange={(e) => setPhotoUrl(e.target.value)}
-            className="border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-gray-900"
-          />
+          {previewSrc && !photo && (
+            <Image src={previewSrc} alt={name} width={400} height={160} className="w-full h-40 object-cover rounded-lg" />
+          )}
+          <label className="flex flex-col gap-1 text-sm">
+            {currentPhoto ? 'Remplacer la photo' : 'Ajouter une photo'}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
+              className="border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-gray-900 file:mr-3 file:rounded-md file:border-0 file:bg-indigo-900 file:px-3 file:py-1 file:text-white"
+            />
+          </label>
           <Button disabled={submitting}>
             {submitting ? 'Enregistrement...' : 'Enregistrer'}
           </Button>

@@ -1,5 +1,20 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {};
+const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+const { protocol, hostname, port } = new URL(apiUrl);
+
+const nextConfig: NextConfig = {
+  images: {
+    dangerouslyAllowLocalIP: true,
+    remotePatterns: [
+      {
+        protocol: protocol.replace(":", "") as "http" | "https",
+        hostname,
+        port: port || undefined,
+        pathname: "/uploads/**",
+      },
+    ],
+  },
+};
 
 export default nextConfig;

@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { API_URL } from '@/lib/constants';
+import { API_URL, photoSrc } from '@/lib/constants';
 import type { User } from '@/types/user';
 import type { Material } from '@/types/material';
 import type { Emprunt, EmpruntStatus } from '@/types/emprunt';
@@ -122,8 +122,8 @@ export default function Dashboard() {
                 key={item.id}
                 className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-gray-900"
               >
-                {item.photoUrl ? (
-                  <Image src={item.photoUrl} alt={item.name} width={400} height={160} className="w-full h-40 object-cover" />
+                {photoSrc(item.photoUrl) ? (
+                  <Image src={photoSrc(item.photoUrl)!} alt={item.name} width={400} height={160} className="w-full h-40 object-cover" />
                 ) : (
                   <div className="w-full h-40 bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400 text-sm">
                     Aucune photo
