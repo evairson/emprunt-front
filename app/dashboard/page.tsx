@@ -62,9 +62,7 @@ export default function Dashboard() {
           <span className="text-xl font-bold hidden sm:inline">Emprunt de matériel</span>
         </a>
         <div className="flex items-center gap-4">
-          {user?.role === 'ADMIN' && (
-            <a href="/admin" className="hover:underline font-medium">Panel Admin</a>
-          )}
+          <a href="/admin" className="hover:underline font-medium">Panel Admin</a>
           <button
             onClick={async () => {
               await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
