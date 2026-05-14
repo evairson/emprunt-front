@@ -24,10 +24,6 @@ Front du système d'emprunt de matériel du BDS Télécom Paris, réalisé dans 
 - Historique complet (admin) filtrable, historique perso (cotisant)
 - Locations en cours triées par date de retour, retards en rouge
 
-## Solution proposée
-
-Application web permettant aux **cotisants** d'emprunter du matériel auprès du BDS et aux **administrateurs** (respo local, bureau) de gérer ce matériel et les demandes d'emprunt.
-
 ### Fonctionnalités implémentées
 
 #### Cotisants
@@ -109,3 +105,8 @@ npm run generate:api
 | `/admin/material/new` | Admin | Création d'un matériel (avec photo). |
 | `/admin/material/[id]/edit` | Admin | Édition d'un matériel. |
 | `/admin/emprunts` | Admin | Historique complet des emprunts, filtrable par statut. |
+
+## Auteurs
+
+- Eva Herson
+- Gabriel Sabot
