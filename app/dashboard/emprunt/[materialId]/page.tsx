@@ -13,7 +13,8 @@ interface Booking {
   endDate: string;
 }
 
-/** Formulaire de demande d'emprunt : calendrier avec jours réservés barrés, validation client+serveur des overlaps. */
+/** Formulaire de demande d'emprunt : calendrier avec jours réservés barrés, 
+ * validation client+serveur des overlaps. */
 export default function EmpruntRequestPage() {
   const router = useRouter();
   const params = useParams<{ materialId: string }>();

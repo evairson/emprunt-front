@@ -7,7 +7,7 @@ import type { User } from '@/types/user';
 import type { Material } from '@/types/material';
 import Button from '@/components/button';
 
-/** Formulaire d'édition d'un matériel ; affiche la photo actuelle et permet de la remplacer. */
+/** Formulaire d'édition d'un matériel, affiche la photo actuelle et permet de la remplacer. */
 export default function EditMaterialPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();

@@ -16,10 +16,10 @@ Front du système d'emprunt de matériel du BDS Télécom Paris, réalisé dans 
 - Gestion des permissions sur la BDD (rôles `USER` / `ADMIN`)
 - Espace administrateur
 - Espace cotisant pour emprunter
-- CRUD du matériel avec upload de photo
+- Gestion du matériel avec upload de photo
 - Demande d'emprunt avec calendrier (jours déjà réservés barrés)
 - Validation des chevauchements de période côté serveur
-- Workflow demande → accept/refus admin → suivi → marquage de retour
+- Gestion des demandes d'emprunt (acceptation/refus)
 - Notifications email (réponse à la demande, rappel le jour de fin)
 - Historique complet (admin) filtrable, historique perso (cotisant)
 - Locations en cours triées par date de retour, retards en rouge
