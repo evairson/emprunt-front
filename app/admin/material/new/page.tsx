@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { API_URL } from '@/lib/constants';
+import { API_URL, MAX_PHOTO_SIZE } from '@/lib/constants';
 import type { User } from '@/types/user';
 import type { Material } from '@/types/material';
 import Button from '@/components/button';
@@ -29,8 +29,12 @@ export default function NewMaterialPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
     setError('');
+    if (photo && photo.size > MAX_PHOTO_SIZE) {
+      setError('La photo dépasse 10 Mo');
+      return;
+    }
+    setSubmitting(true);
     try {
       const res = await fetch(`${API_URL}/material`, {
         method: 'POST',
@@ -89,7 +93,7 @@ export default function NewMaterialPage() {
             className="border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-gray-900"
           />
           <label className="flex flex-col gap-1 text-sm">
-            Photo (optionnel)
+            Photo (optionnel — max 10 Mo)
             <input
               type="file"
               accept="image/*"

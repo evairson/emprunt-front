@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
-import { API_URL, photoSrc } from '@/lib/constants';
+import { API_URL, MAX_PHOTO_SIZE, photoSrc } from '@/lib/constants';
 import type { User } from '@/types/user';
 import type { Material } from '@/types/material';
 import Button from '@/components/button';
@@ -45,8 +45,12 @@ export default function EditMaterialPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
     setError('');
+    if (photo && photo.size > MAX_PHOTO_SIZE) {
+      setError('La photo dépasse 10 Mo');
+      return;
+    }
+    setSubmitting(true);
     try {
       const res = await fetch(`${API_URL}/material/${id}`, {
         method: 'PATCH',
