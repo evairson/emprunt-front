@@ -5,6 +5,7 @@ import type { User } from '@/types/user';
 import type { Emprunt } from '@/types/emprunt';
 import Button from '@/components/button';
 
+/** Dashboard admin : demandes en attente (accept/reject), locations en cours (retards en rouge, checkbox rendu), liens gestion matériel. */
 export default function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);

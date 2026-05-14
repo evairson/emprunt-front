@@ -18,6 +18,7 @@ const STATUS_STYLE: Record<EmpruntStatus, string> = {
   REJECTED: 'bg-red-100 text-red-600',
 };
 
+/** Dashboard cotisant : locations en cours/à venir, matériel disponible, historique de ses demandes. */
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [materials, setMaterials] = useState<Material[]>([]);

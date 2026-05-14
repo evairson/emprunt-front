@@ -23,6 +23,7 @@ const FILTERS: { value: 'ALL' | EmpruntStatus; label: string }[] = [
   { value: 'REJECTED', label: 'Refusées' },
 ];
 
+/** Historique admin de tous les emprunts, triés du plus récent au plus ancien, filtrables par statut. */
 export default function AdminEmpruntsPage() {
   const [loading, setLoading] = useState(true);
   const [emprunts, setEmprunts] = useState<Emprunt[]>([]);

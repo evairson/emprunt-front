@@ -4,6 +4,7 @@ import { api } from '@/services/api';
 import { API_URL } from '@/lib/constants';
 import Button from '@/components/button';
 
+/** Page d'accueil — login Rezel. Redirige vers /dashboard si déjà connecté. */
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');

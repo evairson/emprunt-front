@@ -5,6 +5,7 @@ import { API_URL, photoSrc } from '@/lib/constants';
 import type { User } from '@/types/user';
 import type { Material } from '@/types/material';
 
+/** Liste admin du matériel : grille de cartes avec actions Modifier / Supprimer. */
 export default function AdminMaterialPage() {
   const [loading, setLoading] = useState(true);
   const [materials, setMaterials] = useState<Material[]>([]);

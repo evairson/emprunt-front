@@ -6,6 +6,7 @@ import type { User } from '@/types/user';
 import type { Material } from '@/types/material';
 import Button from '@/components/button';
 
+/** Formulaire de création d'un matériel (nom, description, photo en upload — max 10 Mo). */
 export default function NewMaterialPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
